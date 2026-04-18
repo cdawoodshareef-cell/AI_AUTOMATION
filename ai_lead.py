@@ -1,87 +1,62 @@
-import requests
+import os
 import smtplib
 from email.mime.text import MIMEText
+from openai import OpenAI
 
+# ================= OPENAI SETUP =================
+client = OpenAI(api_key=os.getenv("ae91f5bad8c4e3e031e7b11e41c55941"))
+
+# ================= EMAIL CONFIG =================
+SMTP_SERVER = "smtp.gmail.com"
+SMTP_PORT = 587
+
+# ⚠️ Replace with your sender email
+SENDER_EMAIL = "cdawoodshareef@gmail.com"
+SENDER_PASSWORD = "arxgknlecosbkwtl"  # Use Gmail App Password (NOT normal password)
 
 # ================= AI FUNCTION =================
 def ai_lead(name, message):
-    prompt = f"""
-You are a professional business assistant for DS AI Solutions.
-
-Customer Name: {name}
-Customer Message: {message}
-
-Your task:
-- Write a high-converting professional email reply
-- No subject line
-- No placeholders
-- Keep it short, clear, and persuasive
-
-Business context:
-- DS AI Solutions provides AI automation services
-- Services include dashboards, automation tools, integrations
-- Pricing starts from ₹5,000
-
-Important:
-- Encourage the customer to take next step (call / reply / discussion)
-- Make it feel personalized and helpful
-
-Signature (use exactly):
-Dawood Shareef
-Founder, DS AI Solutions
-India
-"""
-
     try:
-        response = requests.post(
-            "https://openrouter.ai/api/v1/chat/completions",
-            headers={
-                "Authorization": "Bearer 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",
-                "Content-Type": "application/json"
-            },
-            json={
-                "model": "openai/gpt-3.5-turbo",
-                "messages": [
-                    {"role": "user", "content": prompt}
-                ]
-            }
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are a professional sales assistant. Write clear, persuasive, and polite replies to customers."
+                },
+                {
+                    "role": "user",
+                    "content": f"Customer Name: {name}\nCustomer Message: {message}\nWrite a professional response email."
+                }
+            ]
         )
 
-        print("RAW RESPONSE:", response.text)
-
-        data = response.json()
-
-        return data["choices"][0]["message"]["content"]
+        ai_text = response.choices[0].message.content
+        return ai_text
 
     except Exception as e:
         return f"AI Error: {str(e)}"
 
-
 # ================= EMAIL FUNCTION =================
-def send_email(to_email, content):
-    from_email = "cdawoodshareef@gmail.com"
-    app_password = "arxgknlecosbkwtl"
-
+def send_email(receiver_email, message):
     try:
-        msg = MIMEText(content, "plain", "utf-8")
-        msg["Subject"] = "Response to your inquiry"
-        msg["From"] = from_email
-        msg["To"] = to_email
+        msg = MIMEText(message)
+        msg["Subject"] = "Response from DS AI Solutions"
+        msg["From"] = SENDER_EMAIL
+        msg["To"] = receiver_email
 
-        server = smtplib.SMTP("smtp.gmail.com", 587)
+        server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
         server.starttls()
-        server.login(from_email, app_password)
-
-        server.send_message(msg)
+        server.login(SENDER_EMAIL, SENDER_PASSWORD)
+        server.sendmail(SENDER_EMAIL, receiver_email, msg.as_string())
         server.quit()
 
-        print("✅ Email sent successfully!")
+        return "Email sent successfully"
 
     except Exception as e:
-        print("❌ Email Error:", str(e))
+        return f"Email Error: {str(e)}"
 
-
-# ================= MAIN =================
+# ================= MAIN (TESTING ONLY) =================
 if __name__ == "__main__":
     name = "Rahul"
     email = "receiver_email@gmail.com"
@@ -94,4 +69,6 @@ if __name__ == "__main__":
     print(ai_output)
 
     # Send email
-    send_email(email, ai_output)
+    result = send_email(email, ai_output)
+    print("\n===== EMAIL STATUS =====\n")
+    print(result)
