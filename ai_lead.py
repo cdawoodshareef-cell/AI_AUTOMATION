@@ -2,6 +2,7 @@ import os
 import smtplib
 from email.mime.text import MIMEText
 from openai import OpenAI
+from database import save_lead
 
 # ================= OPENAI SETUP =================
 client = OpenAI(api_key=os.getenv("ae91f5bad8c4e3e031e7b11e41c55941"))
@@ -10,9 +11,8 @@ client = OpenAI(api_key=os.getenv("ae91f5bad8c4e3e031e7b11e41c55941"))
 SMTP_SERVER = "smtp.gmail.com"
 SMTP_PORT = 587
 
-# ⚠️ Replace with your sender email
-SENDER_EMAIL = "cdawoodshareef@gmail.com"
-SENDER_PASSWORD = "arxgknlecosbkwtl"  # Use Gmail App Password (NOT normal password)
+SENDER_EMAIL = os.getenv("cdawoodshareef@gmail.com")
+SENDER_PASSWORD = os.getenv("googleSha12%")  # Gmail App Password
 
 # ================= AI FUNCTION =================
 def ai_lead(name, message):
@@ -31,7 +31,7 @@ def ai_lead(name, message):
             ]
         )
 
-        ai_text = response.choices[0].message.content
+        ai_text = response.choices[0].message.content.strip()
         return ai_text
 
     except Exception as e:
@@ -41,7 +41,7 @@ def ai_lead(name, message):
 def send_email(receiver_email, message):
     try:
         msg = MIMEText(message)
-        msg["Subject"] = "Response from DS AI Solutions"
+        msg["Subject"] = "Response from AI Automation"
         msg["From"] = SENDER_EMAIL
         msg["To"] = receiver_email
 
@@ -56,19 +56,33 @@ def send_email(receiver_email, message):
     except Exception as e:
         return f"Email Error: {str(e)}"
 
-# ================= MAIN (TESTING ONLY) =================
+# ================= MAIN PROCESS FUNCTION =================
+def process_lead(name, email, message):
+    # Generate AI response
+    ai_output = ai_lead(name, message)
+
+    # Send email
+    email_status = send_email(email, ai_output)
+
+    # Save to database
+    try:
+        save_lead(name, email, message, ai_output, email_status)
+    except Exception as e:
+        print(f"DB Error: {e}")
+
+    return ai_output, email_status
+
+
+# ================= TESTING =================
 if __name__ == "__main__":
     name = "Rahul"
     email = "receiver_email@gmail.com"
     message = "I want pricing details for your service"
 
-    # Generate AI response
-    ai_output = ai_lead(name, message)
+    ai_output, status = process_lead(name, email, message)
 
     print("\n===== AI OUTPUT =====\n")
     print(ai_output)
 
-    # Send email
-    result = send_email(email, ai_output)
     print("\n===== EMAIL STATUS =====\n")
-    print(result)
+    print(status)
