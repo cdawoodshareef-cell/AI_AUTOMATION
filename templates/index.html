@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>DS AI Dashboard</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial;
+            background: #0f172a;
+            color: white;
+        }
+
+        .sidebar {
+            width: 220px;
+            height: 100vh;
+            position: fixed;
+            background: #020617;
+            padding: 20px;
+        }
+
+        .sidebar h2 {
+            color: #38bdf8;
+        }
+
+        .sidebar a {
+            display: block;
+            color: #cbd5f5;
+            text-decoration: none;
+            margin: 15px 0;
+        }
+
+        .sidebar a:hover {
+            color: #38bdf8;
+        }
+
+        .main {
+            margin-left: 240px;
+            padding: 30px;
+        }
+
+        .card {
+            background: #020617;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.4);
+            max-width: 600px;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 8px;
+            border: none;
+            background: #0f172a;
+            color: white;
+        }
+
+        button {
+            margin-top: 15px;
+            padding: 12px;
+            width: 100%;
+            border: none;
+            border-radius: 8px;
+            background: #38bdf8;
+            color: black;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #0ea5e9;
+        }
+
+        .output {
+            margin-top: 20px;
+            background: #111827;
+            padding: 20px;
+            border-radius: 10px;
+            white-space: pre-wrap;
+        }
+
+        .status {
+            margin-top: 10px;
+            color: #22c55e;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="sidebar">
+    <h2>🤖 DS AI</h2>
+    <a href="/">🏠 Dashboard</a>
+    <a href="/leads">📊 My Leads</a>
+    <a href="/logout">🚪 Logout</a>
+</div>
+
+<div class="main">
+
+    <h1>AI Lead Generator</h1>
+
+    <div class="card">
+        <form method="POST">
+            <input type="text" name="name" placeholder="Customer Name" required>
+            <input type="email" name="email" placeholder="Customer Email" required>
+            <textarea name="message" placeholder="Customer Message" required></textarea>
+
+            <button type="submit">🚀 Generate & Send</button>
+        </form>
+
+        <div class="status">{{ status }}</div>
+
+        {% if output %}
+        <div class="output">
+{{ output }}
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+
+</body>
+</html>

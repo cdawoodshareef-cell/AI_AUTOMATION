@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Leads Dashboard</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #020617;
+            color: white;
+            padding: 20px;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #1e293b;
+        }
+
+        th {
+            background: #0f172a;
+        }
+
+        .btn {
+            padding: 6px 10px;
+            margin: 2px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 12px;
+        }
+
+        .hot { background: red; color: white; }
+        .warm { background: orange; color: black; }
+        .cold { background: gray; color: white; }
+        .convert { background: green; color: white; }
+    </style>
+</head>
+
+<body>
+
+<h2>📊 My Leads</h2>
+
+<table>
+<tr>
+    <th>Name</th>
+    <th>Email</th>
+    <th>Message</th>
+    <th>Status</th>
+    <th>Actions</th>
+</tr>
+
+{% for i, lead in rows %}
+<tr>
+    <td>{{ lead[2] }}</td>
+    <td>{{ lead[3] }}</td>
+    <td>{{ lead[4] }}</td>
+    <td>{{ lead[5] }}</td>
+
+    <td>
+        <a class="btn hot" href="/update_status/{{ i }}/Hot">Hot</a>
+        <a class="btn warm" href="/update_status/{{ i }}/Warm">Warm</a>
+        <a class="btn cold" href="/update_status/{{ i }}/Cold">Cold</a>
+        <a class="btn convert" href="/update_status/{{ i }}/Converted">💰 Convert</a>
+    </td>
+</tr>
+{% endfor %}
+
+</table>
+
+<br>
+<a href="/">⬅ Back</a>
+
+</body>
+</html>
